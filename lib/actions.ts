@@ -2,10 +2,8 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { insertTopic } from "./data";
+import { insertTopic, insertQuestion, incrementVotes, insertAnswer, markAnswerAsAccepted} from "./data";
 import { redirect } from "next/navigation";
-import { insertQuestion } from "./data";
-import { incrementVotes } from "./data";
 
 export async function addTopic(data: FormData) {
   let topic;
@@ -43,5 +41,34 @@ export async function addQuestion(question: FormData) {
     } catch (error) {
       console.error("Database Error:", error);
       throw new Error("Failed to add vote.");
+    }
+  }
+
+  export async function addAnswer(formData: FormData) {
+    const questionId = formData.get("question_id") as string;
+    const text = formData.get("answer") as string;
+  
+    if (!questionId || !text.trim()) {
+      throw new Error("Invalid input.");
+    }
+  
+    try {
+      await insertAnswer({ text, question_id: questionId });
+  
+      revalidatePath(`/ui/questions/${questionId}`);
+    } catch (error) {
+      console.error("Error adding answer:", error);
+      throw new Error("Failed to add answer.");
+    }
+  }
+
+  export async function markAnswerAsCorrect(answerId: string) {
+    try {
+      const { questionId } = await markAnswerAsAccepted(answerId);
+
+      revalidatePath(`/ui/questions/${questionId}`);
+    } catch (error) {
+      console.error("Error in markAnswerAsCorrect:", error);
+      throw new Error("Failed to mark answer as correct.");
     }
   }

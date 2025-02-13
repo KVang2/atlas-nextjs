@@ -93,7 +93,8 @@ async function seedAnswers() {
     CREATE TABLE IF NOT EXISTS answers (
       id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
       answer VARCHAR(255) NOT NULL,
-      question_id UUID NOT NULL
+      question_id UUID NOT NULL,
+      votes INT DEFAULT 0
     );
   `;
 
@@ -105,6 +106,7 @@ async function seedAnswers() {
       answer:
         "It's a new feature in TypeScript that makes it easier to write type-safe code.",
       question_id: "0b93d8dc-6e43-49e3-b59f-b67531247612",
+      votes: 0,
     },
   ];
 
